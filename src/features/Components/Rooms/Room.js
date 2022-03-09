@@ -4,7 +4,7 @@ import Button from "../Button";
 
 const StyledRoom = styled.div`
     display:flex;
-    margin: 1em 0;
+    margin: 0.4em 0;
     justify-content: space-between;
     background-color: rgb(234,234,234);
     padding: 0.4em 1em;
@@ -17,12 +17,12 @@ const StyledRoom = styled.div`
 `
 
 export default function() {
-    return (<StyledRoom>
+    return (
+    <StyledRoom>
         <div className="room-name">
             <div>Room Dyali</div>
             <div>4 players</div>
         </div>
         <Button text="Join"></Button>
-        
     </StyledRoom>)
 }

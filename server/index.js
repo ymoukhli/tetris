@@ -4,8 +4,15 @@ const http = require('http');
 const { stringify } = require('querystring');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
+const cors = require('cors');
+app.use(cors());
 
-const io = new Server(server);
+
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:3000"
+    }
+});
 
 
 const UsersInRoom = [];
@@ -17,6 +24,7 @@ const roomMessage = [];
 const users = [];
 
 io.on('connection', (socket) => {
+    console.log("user connected " + socket.id);
     // send all messages to a user
     socket.emit("displayLobbyMessages", JSON.stringify(messages));
     // send list of all connected users
@@ -28,6 +36,16 @@ io.on('connection', (socket) => {
         messages.push(message);
     })
 
+    socket.on("join", (data) => {
+        const dataObj = JSON.parse(data)
+        if(!dataObj || !dataObj.username) return;
+        // check if username and room are valid
+        if (dataObj.username.trim().match(/^\w+/)[0].length === dataObj.username.trim().length)
+        {
+            users.push(dataObj.username);
+            io.emit('joined');
+        }
+    })
     // recieving a room message
     socket.on("roomMessage", (data) => {
         if (socket.rooms[1])
@@ -54,8 +72,8 @@ io.on('connection', (socket) => {
         socket.emit("displayRoomMessages", () => JSON.stringify(roomMessage[socket.rooms[1]]));
     })
 
-    socket.on("", () => {
-        console.log("empty event");
+    socket.on("disconnect", () => {
+        console.log("user disconnected");
     })
 })
 server.listen(4000, () => {

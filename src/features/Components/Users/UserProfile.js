@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 
 const StyledUserProfile = styled.div`
@@ -11,9 +11,11 @@ const StyledUserProfile = styled.div`
 `
 
 export default function () {
+    useEffect(() => {
 
+    }, [])
     return (<StyledUserProfile>
-        <img src="https://ui-avatars.com/api/?name=youssef+moukhlis"></img>
+        <img src="https://ui-avatars.com/api/?size=40&name=youssef"></img>
         <div className="name">
             <div>youssef moukhlis</div>
             <div>note...</div>

@@ -11,6 +11,6 @@ const StyledButton = styled.button`
     }
 `
 
-export default function(props) {
-    return (<StyledButton onClick={props.onClick}>{props.text}</StyledButton>);
+export default function({type = "button", text, onClick}) {
+    return (<StyledButton type={type} onClick={onClick}>{text}</StyledButton>);
 }
