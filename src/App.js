@@ -6,13 +6,12 @@ import styled from 'styled-components'
 import UsersContainer from './features/Components/Users/UsersContainer';
 import Rooms from './features/Components/Rooms/Rooms';
 import Chat from './features/Components/Chat/Chat';
-import { logIn,selectLog } from './features/join/loggedSlice';
+import { selectLog } from './features/join/loggedSlice';
 import { useSelector } from 'react-redux';
 import Button from './features/Components/Button';
-import { io } from 'socket.io-client';
-import { selectSocket, setSocket } from './features/sockets.slice';
+import { selectSocket, connectingSocket } from './features/sockets.slice';
 import { useDispatch } from 'react-redux';
-import { addUser } from './features/Users/userSlice';
+import { addUser } from './features/Slices/userSlice';
 
 const StyledApp = styled.div`
 background-color: gray;
@@ -46,30 +45,13 @@ height: 100vh;
 function App() {
   const joined = useSelector(selectLog);
   const dispatch = useDispatch();
-  const socketa = useSelector(selectSocket);
 
   useEffect(() => {
-    const socket = io('http://localhost:4000');
-    socket.on('connect', () => {
-      dispatch(setSocket(socket));
-    });
-    socket.on('joined', () => {
-      dispatch(logIn())
-    })
-
-    return () => {
-      socket.off('connect');
-      socket.off('joined')
-    }
-  }, []);
-
+    dispatch(connectingSocket);
+  }, [])
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (socketa)
-    {
-      socketa.emit("join", JSON.stringify({username: e.target[0].value}))
       dispatch(addUser(e.target[0].value))
-    }
   }
   
   return (
@@ -83,7 +65,7 @@ function App() {
         </form>
       </div>}
       {joined && 
-      <div class="lobby">
+      <div className="lobby">
         <UsersContainer></UsersContainer>
         <Rooms></Rooms>
         <Chat></Chat>

@@ -6,12 +6,12 @@ import Title from "../Title"
 import Switchs from "../Switchs"
 import Users from "./Users"
 
+const StyledUsersContainer = styled.div`
+    background-color: white;
+    text-align: center;
+    padding: 1rem;
+`
 export default function () {
-    const StyledUsersContainer = styled.div`
-        background-color: white;
-        text-align: center;
-        padding: 1rem;
-    `
     return (<StyledUsersContainer>
 
         <UserNav></UserNav>

@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import Button from "../Button";
 import UserProfile from "./UserProfile";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../Slices/userSlice";
 
 const StyledUserProfile = styled.div`
     display: flex;
@@ -9,9 +11,10 @@ const StyledUserProfile = styled.div`
 `
 
 export default function () {
+    const user = useSelector(selectUser)
 
     return (<StyledUserProfile>
-        <UserProfile></UserProfile>
+        <UserProfile user={user}></UserProfile>
         <Button text="Edit"></Button>
     </StyledUserProfile>);
 }

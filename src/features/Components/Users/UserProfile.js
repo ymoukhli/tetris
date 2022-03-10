@@ -10,14 +10,12 @@ const StyledUserProfile = styled.div`
     }
 `
 
-export default function () {
-    useEffect(() => {
+export default function ({user}) {
 
-    }, [])
     return (<StyledUserProfile>
-        <img src="https://ui-avatars.com/api/?size=40&name=youssef"></img>
+        <img src={"https://ui-avatars.com/api/?size=40&name="+ user}></img>
         <div className="name">
-            <div>youssef moukhlis</div>
+            <div>{user}</div>
             <div>note...</div>
         </div>
     </StyledUserProfile>);

@@ -17,35 +17,39 @@ const io = new Server(server, {
 
 const UsersInRoom = [];
 // holdes all messages in a lobby
-const messages = [];
+const globalMessages = [];
 // holdes room messages
 const roomMessage = [];
 // holde all connected users;
 const users = [];
 
 io.on('connection', (socket) => {
+    let user = ''
     console.log("user connected " + socket.id);
     // send all messages to a user
-    socket.emit("displayLobbyMessages", JSON.stringify(messages));
     // send list of all connected users
-    socket.emit("displayConnectedUsers", JSON.stringify(users));
 
     // recieving a lobby message
-    socket.on("lobbyMessage", (data) => {
+    socket.on("globalMessage", (data) => {
         const message = JSON.parse(data);
-        messages.push(message);
-    })
+        globalMessages.push(message);
+        io.emit('updateGlobalMessage', JSON.stringify(globalMessages));
+    });
 
     socket.on("join", (data) => {
         const dataObj = JSON.parse(data)
-        if(!dataObj || !dataObj.username) return;
+        console.log(dataObj, 'joined')
         // check if username and room are valid
-        if (dataObj.username.trim().match(/^\w+/)[0].length === dataObj.username.trim().length)
-        {
-            users.push(dataObj.username);
-            io.emit('joined');
-        }
-    })
+        if(!dataObj || !dataObj.username ||
+        dataObj.username.trim().match(/^\w+/)[0].length !== dataObj.username.trim().length) return;
+        if (users.indexOf(dataObj.username) !== -1) return;
+        users.push(dataObj.username);
+        socket.emit('joined');
+        io.emit('updateOnlineUsers', users);
+        socket.emit('updateGlobalMessage',  JSON.stringify(globalMessages));
+        user = dataObj.username;
+    });
+
     // recieving a room message
     socket.on("roomMessage", (data) => {
         if (socket.rooms[1])
@@ -73,6 +77,9 @@ io.on('connection', (socket) => {
     })
 
     socket.on("disconnect", () => {
+        users.splice(users.indexOf(user),1)
+        console.log(users, user)
+        io.emit('updateOnlineUsers', users);
         console.log("user disconnected");
     })
 })

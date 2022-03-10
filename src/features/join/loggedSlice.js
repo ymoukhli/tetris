@@ -10,6 +10,7 @@ export const loggedSlice = createSlice({
     initialState,
     reducers: {
         logIn: (state) => {
+            console.log("here")
             state.joined = true;
         },
         logOut: (state) => {
