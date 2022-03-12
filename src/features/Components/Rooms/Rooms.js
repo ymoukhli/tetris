@@ -13,6 +13,7 @@ padding: 1em;
 `
 
 export default function() {
+    // add creat room
     return (<StyledRooms>
         <Button text="Creat New Room"></Button>
         <Seperator></Seperator>
