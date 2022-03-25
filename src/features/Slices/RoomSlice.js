@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 const initialState = {
-    rooms : [],
+    rooms : {},
 }
 
 const RoomSlice = createSlice({
@@ -15,4 +15,4 @@ const RoomSlice = createSlice({
 
 export const selectRooms = (state) => state.rooms.rooms;
 export const { updateRooms } = RoomSlice.actions;
-export default RoomSlice.reducer
+export default RoomSlice.reducer;

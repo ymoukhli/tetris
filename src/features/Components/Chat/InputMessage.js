@@ -24,7 +24,6 @@ export default function () {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(e.target[0].value)
         dispatch({type: 'message', payload: {text: e.target[0].value, username}})
         e.target[0].value = '';
     }

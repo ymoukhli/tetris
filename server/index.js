@@ -15,7 +15,7 @@ const io = new Server(server, {
 });
 
 
-const UsersInRoom = [];
+const UsersInRoom = {};
 // holdes all messages in a lobby
 const globalMessages = [];
 // holdes room messages
@@ -47,6 +47,7 @@ io.on('connection', (socket) => {
         socket.emit('joined');
         io.emit('updateOnlineUsers', users);
         socket.emit('updateGlobalMessage',  JSON.stringify(globalMessages));
+        displayRooms();
         user = dataObj.username;
     });
 
@@ -54,35 +55,60 @@ io.on('connection', (socket) => {
     socket.on("roomMessage", (data) => {
         if (socket.rooms[1])
         {
-            const message = Json.parse(data);
+            const message = JSON.parse(data);
             roomMessage[socket.rooms[1]].push(message);
         }
     })
 
-    socket.on("joinRoom", (data) => {
+    socket.on("tryCreateRoom", (data) => {
         const dataObj = JSON.parse(data);
         // check if can join room +++
+        if (!dataObj.room) dataObj.room = Math.random().toString(36).replace(/[^a-z]+/g, '');
+        socket.join(dataObj.room)
+        UsersInRoom[dataObj.room] = {};
+        UsersInRoom[dataObj.room].users = [];
+        UsersInRoom[dataObj.room].users.push(dataObj.user);
 
-        socket.join(dataObj.room);
-        UsersInRoom[dataObj.room].users.push(data.user);
         if (!UsersInRoom[dataObj.room].master)
         {
-            UsersInRoom[dataObj.room].master = data.user;
+            UsersInRoom[dataObj.room].master = socket.id;
         }
-
+        console.log('users in Room : ',UsersInRoom)
         // send update to all users;
-        io.to(socket.rooms[1]).emit("displayRoomUsers", () => UsersInRoom[socket.rooms[1]]);
-        // send message update to connected user
-        socket.emit("displayRoomMessages", () => JSON.stringify(roomMessage[socket.rooms[1]]));
+        displayRooms();
     })
 
     socket.on("disconnect", () => {
-        users.splice(users.indexOf(user),1)
+        if (users.indexOf(user) !== -1) users.splice(users.indexOf(user),1)
         console.log(users, user)
+        
         io.emit('updateOnlineUsers', users);
+
+        // remove user
+        removeUser(user);
         console.log("user disconnected");
     })
 })
 server.listen(4000, () => {
     console.log('listening on port 4000');
 })
+
+
+const removeUser = (user) => {
+    for(const [key, value] of Object.entries(UsersInRoom))
+    {
+        const index = value.users.indexOf(user);
+        if (index !== -1)
+            value.users.splice(index,1)
+        if (value.users.length <= 0)
+        {
+            delete UsersInRoom[key];
+            displayRooms();
+        }
+        
+    }
+}
+const displayRooms = () => {
+    io.emit('displayRooms', JSON.stringify(UsersInRoom))
+};
+        

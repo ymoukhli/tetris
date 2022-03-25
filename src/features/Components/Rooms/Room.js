@@ -1,4 +1,7 @@
+/* eslint-disable import/no-anonymous-default-export */
 import React from "react";
+import { useSelector } from "react-redux";
+import { selectId } from "../../Slices/userSlice";
 import styled from "styled-components";
 import Button from "../Button";
 
@@ -13,16 +16,20 @@ const StyledRoom = styled.div`
     .room-name div:nth-child(2) {
         font-size: 0.9rem;
     }
-
 `
 
-export default function() {
+export default function({name,master,users}) {
+    const myId = useSelector(selectId);
+    console.log(master, myId, users);
     return (
     <StyledRoom>
         <div className="room-name">
-            <div>Room Dyali</div>
-            <div>4 players</div>
+            <div>{name}</div>
+            <div>{users.join(', ')}</div>
+            <div>{users.length} players</div>
         </div>
-        <Button text="Join"></Button>
-    </StyledRoom>)
+        {master !== myId && <Button text="Join"></Button>}
+        {master === myId && <Button text="start"></Button>}
+    </StyledRoom>
+    )
 }

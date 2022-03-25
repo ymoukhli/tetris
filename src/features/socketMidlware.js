@@ -31,20 +31,23 @@ export const socketMidlware = (store) => {
                 store.dispatch(updateRoomMessages(messages))
             })
 
-            socket.on('updateRooms', (rooms) => {
-                const data = JSON.parse(rooms)
+            // socket.on('updateRooms', (rooms) => {
+            //     const data = JSON.parse(rooms)
+            //     store.dispatch(updateRooms(data))
+            // })
+            socket.on('displayRooms', (dataString) => {
+                const data = JSON.parse(dataString);
                 store.dispatch(updateRooms(data))
             })
         }
         if (action.type === 'message')
         {
-            console.log(action)
             action.payload.id = socket.id;
             socket.emit('globalMessage', JSON.stringify(action.payload));
         }
-        if (action.type === 'createRoom')
+        if (action.type === 'creatRoom')
         {
-            socket.emit('tryCreateRoom', JSON.stringify({...action.payload, id : socket.id}))
+            socket.emit('tryCreateRoom', JSON.stringify({...action.payload, id : socket.id, user: store.getState().users.user}))
         }
         if (addUser.match(action))
         {
