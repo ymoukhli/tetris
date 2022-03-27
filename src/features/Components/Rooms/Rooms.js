@@ -30,7 +30,7 @@ export default function() {
     jsxRooms = Object.keys(rooms).map((e, i) => 
     <Room 
         key={i} 
-        name={e} 
+        room={e} 
         master={rooms[e].master}
         users={rooms[e].users}
     ></Room>)

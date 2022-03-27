@@ -18,13 +18,14 @@ form, input, button {
     }
 `
 
-export default function () {
+export default function ({type}) {
     const dispatch = useDispatch();
     const username = useSelector(selectUser);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch({type: 'message', payload: {text: e.target[0].value, username}})
+        console.log(type)
+        dispatch({type: type, payload: {text: e.target[0].value, username}})
         e.target[0].value = '';
     }
     return (<StyledInputMessage>

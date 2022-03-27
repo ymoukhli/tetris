@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { addOtherUsers, addUser,addId } from "./Slices/userSlice";
 import { logIn } from "./join/loggedSlice";
 import { updateGlobalMessages, updateRoomMessages } from "./Slices/MessageSlice";
-import { updateRooms } from "./Slices/RoomSlice";
+import { updateRooms,setRoom } from "./Slices/RoomSlice";
 
 export const socketMidlware = (store) => {
     let socket;
@@ -27,31 +27,41 @@ export const socketMidlware = (store) => {
                 store.dispatch(updateGlobalMessages(data))
             })
             
-            socket.on('updateRoomlMessage', (messages) => {
-                store.dispatch(updateRoomMessages(messages))
+            socket.on('updateRoomMessage', (messages) => {
+                const data = JSON.parse(messages)
+                console.log(data)
+                store.dispatch(updateRoomMessages(data))
             })
-
-            // socket.on('updateRooms', (rooms) => {
-            //     const data = JSON.parse(rooms)
-            //     store.dispatch(updateRooms(data))
-            // })
             socket.on('displayRooms', (dataString) => {
+                console.log(socket)
                 const data = JSON.parse(dataString);
                 store.dispatch(updateRooms(data))
             })
+            socket.on('roomJoined', (dataString) => {
+                store.dispatch(setRoom(true));
+            })
         }
-        if (action.type === 'message')
+        if (action.type === 'global')
         {
             action.payload.id = socket.id;
             socket.emit('globalMessage', JSON.stringify(action.payload));
+        }
+        if (action.type === 'room')
+        {
+            action.payload.id = socket.id;
+            socket.emit('roomMessage', JSON.stringify(action.payload));
         }
         if (action.type === 'creatRoom')
         {
             socket.emit('tryCreateRoom', JSON.stringify({...action.payload, id : socket.id, user: store.getState().users.user}))
         }
+        if (action.type === 'joinRoom')
+        {
+            socket.emit('joinRoom', JSON.stringify({room: action.payload}))
+        }
         if (addUser.match(action))
         {
-            store.dispatch(addId(socket.id))
+            store.dispatch(addId(socket.id));
             socket.emit('join', JSON.stringify({username: action.payload}));
         }
         next(action);

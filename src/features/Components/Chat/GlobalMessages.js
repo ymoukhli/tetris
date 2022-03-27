@@ -15,8 +15,12 @@ const StyeldMessages = styled.div`
 export default function () {
     const globalMessagesState = useSelector(selectGlobalMessages);
     const id = useSelector(selectId);
-    const globalMessages = globalMessagesState.map((e, i) => {console.log(id, e.id.length); return <Message key={i} text={e.text} username={e.username} min={(id === e.id).toString()}></Message>})
-    return (<StyeldMessages>
+    const globalMessages = globalMessagesState.map((e, i) =>
+    <Message key={i} text={e.text} username={e.username} min={(id === e.id).toString()}/>)
+    
+    return (
+    <StyeldMessages>
         {globalMessages}
-    </StyeldMessages>)
+    </StyeldMessages>
+    )
 }

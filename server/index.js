@@ -19,12 +19,13 @@ const UsersInRoom = {};
 // holdes all messages in a lobby
 const globalMessages = [];
 // holdes room messages
-const roomMessage = [];
+const roomMessage = {};
 // holde all connected users;
 const users = [];
 
 io.on('connection', (socket) => {
-    let user = ''
+    let user = '';
+    let room = '';
     console.log("user connected " + socket.id);
     // send all messages to a user
     // send list of all connected users
@@ -38,7 +39,6 @@ io.on('connection', (socket) => {
 
     socket.on("join", (data) => {
         const dataObj = JSON.parse(data)
-        console.log(dataObj, 'joined')
         // check if username and room are valid
         if(!dataObj || !dataObj.username ||
         dataObj.username.trim().match(/^\w+/)[0].length !== dataObj.username.trim().length) return;
@@ -53,39 +53,63 @@ io.on('connection', (socket) => {
 
     // recieving a room message
     socket.on("roomMessage", (data) => {
-        if (socket.rooms[1])
+        if (room)
         {
             const message = JSON.parse(data);
-            roomMessage[socket.rooms[1]].push(message);
+            roomMessage[room].push(message);
+            io.to(room).emit('updateRoomMessage', JSON.stringify(roomMessage[room]))
         }
     })
 
+    socket.on('joinRoom', (data) => {
+        const myRoom = JSON.parse(data)
+        removeUser(user, socket, room);
+        room = myRoom.room;
+        if (UsersInRoom[room])
+        {
+            UsersInRoom[room].users.push(user);
+            UsersInRoom[room].ids.push(socket.id);
+            socket.join(room);
+            displayRooms();
+            socket.emit('roomJoined');
+            displayRoomMessage(room);
+        }
+    })
     socket.on("tryCreateRoom", (data) => {
         const dataObj = JSON.parse(data);
         // check if can join room +++
-        if (!dataObj.room) dataObj.room = Math.random().toString(36).replace(/[^a-z]+/g, '');
-        socket.join(dataObj.room)
-        UsersInRoom[dataObj.room] = {};
-        UsersInRoom[dataObj.room].users = [];
-        UsersInRoom[dataObj.room].users.push(dataObj.user);
+        if (!dataObj.room)
+            dataObj.room = Math.random().toString(36).replace(/[^a-z]+/g, '');
 
-        if (!UsersInRoom[dataObj.room].master)
+
+        socket.join(dataObj.room);
+        removeUser(dataObj.user ,socket, room);
+        room = dataObj.room;
+        UsersInRoom[room] = {};
+        UsersInRoom[room].users = [];
+        UsersInRoom[room].ids = [];
+
+        displayRoomMessage(room)
+        UsersInRoom[room].users.push(dataObj.user);
+        UsersInRoom[room].ids.push(socket.id);
+        
+        if (!UsersInRoom[room].master)
         {
-            UsersInRoom[dataObj.room].master = socket.id;
+            UsersInRoom[room].master = socket.id;
         }
-        console.log('users in Room : ',UsersInRoom)
         // send update to all users;
         displayRooms();
+        socket.emit('roomJoined') //
     })
 
     socket.on("disconnect", () => {
-        if (users.indexOf(user) !== -1) users.splice(users.indexOf(user),1)
-        console.log(users, user)
+        if (users.indexOf(user) !== -1)
+            users.splice(users.indexOf(user),1)
         
         io.emit('updateOnlineUsers', users);
-
         // remove user
-        removeUser(user);
+        removeUser(user, socket, room);
+        displayRooms();
         console.log("user disconnected");
     })
 })
@@ -94,21 +118,40 @@ server.listen(4000, () => {
 })
 
 
-const removeUser = (user) => {
-    for(const [key, value] of Object.entries(UsersInRoom))
+const removeUser = (user, socket, room) => {
+    if (!room) return;
+    const value = UsersInRoom[room]
+    const index = value.users.indexOf(user);
+    if (index !== -1)
     {
-        const index = value.users.indexOf(user);
-        if (index !== -1)
-            value.users.splice(index,1)
+        const idIndex = value.ids.indexOf(socket.id);
+        
+        // clear user from local data;
+        value.users.splice(index,1);
+        if (idIndex >= 0) value.ids.splice(idIndex, 1); 
+        socket.leave(room);
         if (value.users.length <= 0)
         {
-            delete UsersInRoom[key];
+            delete UsersInRoom[room];
             displayRooms();
         }
-        
+        // replace room master if needed
+        else
+        {
+            if (socket.id === value.master)
+            {
+                value.master = value.ids[0];
+            }
+        }
     }
+    room = '';
 }
 const displayRooms = () => {
     io.emit('displayRooms', JSON.stringify(UsersInRoom))
 };
+
+const displayRoomMessage = (room) => {
+    if (!roomMessage[room]) roomMessage[room] = []
+    io.to(room).emit('updateRoomMessage', JSON.stringify(roomMessage[room]))
+}
         

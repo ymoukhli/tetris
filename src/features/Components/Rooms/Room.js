@@ -1,7 +1,7 @@
 /* eslint-disable import/no-anonymous-default-export */
 import React from "react";
-import { useSelector } from "react-redux";
-import { selectId } from "../../Slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectId, selectUser } from "../../Slices/userSlice";
 import styled from "styled-components";
 import Button from "../Button";
 
@@ -18,17 +18,26 @@ const StyledRoom = styled.div`
     }
 `
 
-export default function({name,master,users}) {
+export default function({room,master,users}) {
     const myId = useSelector(selectId);
-    console.log(master, myId, users);
+    const user = useSelector(selectUser);
+    // const ready = useSelector(selectReadyState);
+    const dispatch = useDispatch();
+    function joinRoom() {
+        dispatch({type: 'joinRoom', payload: room})
+    }
+
+    const joined = users.find(e => e === user);
+    
     return (
     <StyledRoom>
         <div className="room-name">
-            <div>{name}</div>
+            <div>{room}</div>
             <div>{users.join(', ')}</div>
             <div>{users.length} players</div>
         </div>
-        {master !== myId && <Button text="Join"></Button>}
+        {master !== myId && !joined && <Button onClick={joinRoom} text="Join"></Button>}
+        {master !== myId && joined && <Button onClick={() => console.log('ready')} text="ready"></Button>}
         {master === myId && <Button text="start"></Button>}
     </StyledRoom>
     )
