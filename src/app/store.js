@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import counterReducer from '../features/counter/counterSlice';
-import loggedReducer from '../features/join/loggedSlice';
+import loggedReducer from '../features/Slices/loggedSlice';
 import { socketMidlware } from '../features/socketMidlware';
 import socketReducer from '../features/sockets.slice';
 import userReducer from '../features/Slices/userSlice';

@@ -1,7 +1,7 @@
 import { connectSocket,connectingSocket } from "./sockets.slice"
 import { io } from "socket.io-client";
-import { addOtherUsers, addUser,addId } from "./Slices/userSlice";
-import { logIn } from "./join/loggedSlice";
+import { addOtherUsers, addUser,addId,setRoomUsers } from "./Slices/userSlice";
+import { logIn } from "./Slices/loggedSlice";
 import { updateGlobalMessages, updateRoomMessages } from "./Slices/MessageSlice";
 import { updateRooms,setRoom } from "./Slices/RoomSlice";
 
@@ -39,6 +39,11 @@ export const socketMidlware = (store) => {
             })
             socket.on('roomJoined', (dataString) => {
                 store.dispatch(setRoom(true));
+            })
+            socket.on('displayRoomUsers', (dataString) => {
+                console.log('receiving data of users in a room '+dataString)
+                const data = JSON.parse(dataString);
+                store.dispatch(setRoomUsers(data));
             })
         }
         if (action.type === 'global')

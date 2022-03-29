@@ -12,13 +12,18 @@ const StyledUsersContainer = styled.div`
     padding: 1rem;
 `
 export default function () {
+    const [globalUsersSelected, setGlobalUsersSelected] = useState(true);
     return (<StyledUsersContainer>
 
         <UserNav></UserNav>
         <Seperator></Seperator>
         <Title text="Online Users"></Title>
+        <div>
+            <button ></button>
+            <button></button>
+        </div>
         <Switchs></Switchs>
-        <Users></Users>
+        {globalUsersSelected ? <Users/>: <RoomUsers/>}
 
     </StyledUsersContainer>)
 }

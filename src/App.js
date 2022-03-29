@@ -1,15 +1,13 @@
 import React, { useEffect } from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
 import './App.css';
 import styled from 'styled-components'
 import UsersContainer from './features/Components/Users/UsersContainer';
 import Rooms from './features/Components/Rooms/Rooms';
 import Chat from './features/Components/Chat/Chat';
-import { selectLog } from './features/join/loggedSlice';
+import { selectLog } from './features/Slices/loggedSlice';
 import { useSelector } from 'react-redux';
 import Button from './features/Components/Button';
-import { selectSocket, connectingSocket } from './features/sockets.slice';
+import { connectingSocket } from './features/sockets.slice';
 import { useDispatch } from 'react-redux';
 import { addUser } from './features/Slices/userSlice';
 

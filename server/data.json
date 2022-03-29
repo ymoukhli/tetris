@@ -1,0 +1,14 @@
+{
+    "UsersInRoom": {
+        "ROOMNAME":{
+            "users": [],
+            "ids":[],
+            "master":""
+        }
+    },
+    "globalMessages": [{"id":"", "username":"","text":""}],
+    "roomMessage": {
+        "ROOMNAME": [{"id":"", "username":"","text":""}]
+    },
+    "users":[]
+}

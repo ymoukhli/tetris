@@ -7,13 +7,11 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 app.use(cors());
 
-
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:3000"
     }
 });
-
 
 const UsersInRoom = {};
 // holdes all messages in a lobby
@@ -29,7 +27,6 @@ io.on('connection', (socket) => {
     console.log("user connected " + socket.id);
     // send all messages to a user
     // send list of all connected users
-
     // recieving a lobby message
     socket.on("globalMessage", (data) => {
         const message = JSON.parse(data);
@@ -70,7 +67,7 @@ io.on('connection', (socket) => {
             UsersInRoom[room].users.push(user);
             UsersInRoom[room].ids.push(socket.id);
             socket.join(room);
-            displayRooms();
+            displayRooms(room);
             socket.emit('roomJoined');
             displayRoomMessage(room);
         }
@@ -80,7 +77,6 @@ io.on('connection', (socket) => {
         // check if can join room +++
         if (!dataObj.room)
             dataObj.room = Math.random().toString(36).replace(/[^a-z]+/g, '');
-
 
         socket.join(dataObj.room);
         removeUser(dataObj.user ,socket, room);
@@ -98,18 +94,18 @@ io.on('connection', (socket) => {
             UsersInRoom[room].master = socket.id;
         }
         // send update to all users;
-        displayRooms();
+        displayRooms(room);
         socket.emit('roomJoined') //
     })
 
     socket.on("disconnect", () => {
         if (users.indexOf(user) !== -1)
-            users.splice(users.indexOf(user),1)
+            users.splice(users.indexOf(user),1);
         
         io.emit('updateOnlineUsers', users);
         // remove user
         removeUser(user, socket, room);
-        displayRooms();
+        displayRooms(room);
         console.log("user disconnected");
     })
 })
@@ -117,10 +113,9 @@ server.listen(4000, () => {
     console.log('listening on port 4000');
 })
 
-
 const removeUser = (user, socket, room) => {
     if (!room) return;
-    const value = UsersInRoom[room]
+    const value = UsersInRoom[room];
     const index = value.users.indexOf(user);
     if (index !== -1)
     {
@@ -133,7 +128,7 @@ const removeUser = (user, socket, room) => {
         if (value.users.length <= 0)
         {
             delete UsersInRoom[room];
-            displayRooms();
+            displayRooms(room);
         }
         // replace room master if needed
         else
@@ -146,12 +141,24 @@ const removeUser = (user, socket, room) => {
     }
     room = '';
 }
-const displayRooms = () => {
-    io.emit('displayRooms', JSON.stringify(UsersInRoom))
+
+const displayRooms = (room) => {
+    io.emit('displayRooms', JSON.stringify(UsersInRoom));
+    console.log('display rooms ' + room)
+    if(room && UsersInRoom[room])
+    {
+        io.to(room).emit(   
+            'displayRoomUsers',
+            JSON.stringify({
+                users: UsersInRoom[room].users,
+                master: UsersInRoom[room].master
+            }));
+        console.log(`emitting users ${UsersInRoom[room]}`);
+    }
 };
 
 const displayRoomMessage = (room) => {
-    if (!roomMessage[room]) roomMessage[room] = []
-    io.to(room).emit('updateRoomMessage', JSON.stringify(roomMessage[room]))
+    if (!roomMessage[room]) roomMessage[room] = [];
+    io.to(room).emit('updateRoomMessage', JSON.stringify(roomMessage[room]));
 }
         
