@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectId, selectUser } from "../../Slices/userSlice";
 import styled from "styled-components";
 import Button from "../Button";
+import { useNavigate } from "react-router-dom";
 
 const StyledRoom = styled.div`
     display:flex;
@@ -21,15 +22,20 @@ const StyledRoom = styled.div`
 export default function({room,master,users,inRoom}) {
     const myId = useSelector(selectId);
     const user = useSelector(selectUser);
+    const navigate = useNavigate();
     // const ready = useSelector(selectReadyState);
     const dispatch = useDispatch();
     function joinRoom() {
+        navigate(`#${room}[${user}]`)
         dispatch({type: 'joinRoom', payload: room})
     }
 
     function leaveRoom() {
+        navigate(``)
         dispatch({type: 'leaveRoom', payload: room})
     }
+
+
     const joined = users.find(e => e === user);
     
     return (

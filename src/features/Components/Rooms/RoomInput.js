@@ -2,7 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import { useRef,useEffect } from "react";
 import { useDispatch } from "react-redux";
-
+import { selectUser } from "../../Slices/userSlice";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 const StyledRoomInput = styled.div`
     position: fixed;
     left: 0;
@@ -22,12 +24,14 @@ const StyledRoomInput = styled.div`
         button {
             margin: 1.2em 2em 0.2em;
         }
-    }l
+    }
 `
 
 export default function ({ setRoomInput }) {
     const roomInputRef = useRef();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const user = useSelector(selectUser);
     useEffect(() => {
         function handleClickMouse(event) {
             if (roomInputRef.current && !roomInputRef.current.contains(event.target))
@@ -47,12 +51,16 @@ export default function ({ setRoomInput }) {
         event.preventDefault();
 
         setRoomInput(false);
-        dispatch({type: 'creatRoom', payload: {room: event.target[0].value}})
+        let room = event.target[0].value;
+        if (!room) room = Math.random().toString(36).replace(/[^a-z]+/g, '');
+
+        dispatch({type: 'creatRoom', payload: {room}})
+        navigate(`#${room}[${user}]`)
     }
     return (<StyledRoomInput >
-        <form  onSubmit={handleSubmit} ref={roomInputRef}>
-            <input type="text"></input>
-            <button type="submit">Creat</button>
-        </form>
-    </StyledRoomInput>)
+            <form  onSubmit={handleSubmit} ref={roomInputRef}>
+                <input type="text"></input>
+                <button type="submit">Creat</button>
+            </form>
+        </StyledRoomInput>)
 }
