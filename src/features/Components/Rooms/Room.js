@@ -18,7 +18,7 @@ const StyledRoom = styled.div`
     }
 `
 
-export default function({room,master,users}) {
+export default function({room,master,users,inRoom}) {
     const myId = useSelector(selectId);
     const user = useSelector(selectUser);
     // const ready = useSelector(selectReadyState);
@@ -27,18 +27,24 @@ export default function({room,master,users}) {
         dispatch({type: 'joinRoom', payload: room})
     }
 
+    function leaveRoom() {
+        dispatch({type: 'leaveRoom', payload: room})
+    }
     const joined = users.find(e => e === user);
     
     return (
     <StyledRoom>
         <div className="room-name">
-            <div>{room}</div>
+            <h3>{room}</h3>
             <div>{users.join(', ')}</div>
             <div>{users.length} players</div>
         </div>
-        {master !== myId && !joined && <Button onClick={joinRoom} text="Join"></Button>}
-        {master !== myId && joined && <Button onClick={() => console.log('ready')} text="ready"></Button>}
-        {master === myId && <Button text="start"></Button>}
+        <div>
+            {inRoom && <Button text="leave" onClick={leaveRoom}></Button>}
+            {master !== myId && !joined && <Button onClick={joinRoom} text="Join"/>}
+            {master !== myId && joined && <Button onClick={() => console.log('ready')} text="ready"/>}
+            {master === myId && <Button text="start"></Button>}
+        </div>
     </StyledRoom>
     )
 }

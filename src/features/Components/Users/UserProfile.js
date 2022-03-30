@@ -15,8 +15,7 @@ export default function ({user}) {
     return (<StyledUserProfile>
         <img src={"https://ui-avatars.com/api/?size=40&name="+ user}></img>
         <div className="name">
-            <div>{user}</div>
-            <div>note...</div>
+            <h3>{user}</h3>
         </div>
     </StyledUserProfile>);
 }

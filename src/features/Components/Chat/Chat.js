@@ -7,7 +7,7 @@ import RoomMessages from './RoomMessage.js'
 import InputMessage from "./InputMessage";
 import { useSelector } from "react-redux";
 import { selectIsInRoom } from "../../Slices/RoomSlice";
-
+import { useEffect } from "react";
 const StyledChat = styled.div`
     background-color: white;
     padding: 1em;
@@ -31,6 +31,11 @@ export default function () {
     function handleGlobalClick() {
         setToGlobalChat(true);
     }
+
+    useEffect(() => {
+        setToGlobalChat(true);
+    }, [inRoom]);
+
     return (
     <StyledChat>
         <Title text="Chat"></Title>

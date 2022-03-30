@@ -25,9 +25,6 @@ io.on('connection', (socket) => {
     let user = '';
     let room = '';
     console.log("user connected " + socket.id);
-    // send all messages to a user
-    // send list of all connected users
-    // recieving a lobby message
     socket.on("globalMessage", (data) => {
         const message = JSON.parse(data);
         globalMessages.push(message);
@@ -67,12 +64,13 @@ io.on('connection', (socket) => {
             UsersInRoom[room].users.push(user);
             UsersInRoom[room].ids.push(socket.id);
             socket.join(room);
-            displayRooms(room);
             socket.emit('roomJoined');
+            displayRooms(room);
             displayRoomMessage(room);
         }
     })
     socket.on("tryCreateRoom", (data) => {
+
         const dataObj = JSON.parse(data);
         // check if can join room +++
         if (!dataObj.room)
@@ -81,23 +79,25 @@ io.on('connection', (socket) => {
         socket.join(dataObj.room);
         removeUser(dataObj.user ,socket, room);
         room = dataObj.room;
-        UsersInRoom[room] = {};
-        UsersInRoom[room].users = [];
-        UsersInRoom[room].ids = [];
+        initRoom(room,UsersInRoom)
 
-        displayRoomMessage(room)
         UsersInRoom[room].users.push(dataObj.user);
         UsersInRoom[room].ids.push(socket.id);
-        
         if (!UsersInRoom[room].master)
         {
             UsersInRoom[room].master = socket.id;
         }
+        
         // send update to all users;
+        displayRoomMessage(room);
         displayRooms(room);
-        socket.emit('roomJoined') //
+        socket.emit('roomJoined');
     })
-
+    socket.on('leaveRoom', (dataString) => {
+        const data = JSON.parse(dataString);
+        removeUser(user, socket, room);
+        socket.emit('removedFromRoom')
+    })
     socket.on("disconnect", () => {
         if (users.indexOf(user) !== -1)
             users.splice(users.indexOf(user),1);
@@ -105,7 +105,6 @@ io.on('connection', (socket) => {
         io.emit('updateOnlineUsers', users);
         // remove user
         removeUser(user, socket, room);
-        displayRooms(room);
         console.log("user disconnected");
     })
 })
@@ -114,7 +113,7 @@ server.listen(4000, () => {
 })
 
 const removeUser = (user, socket, room) => {
-    if (!room) return;
+    if (!room || !UsersInRoom[room]) return;
     const value = UsersInRoom[room];
     const index = value.users.indexOf(user);
     if (index !== -1)
@@ -128,7 +127,6 @@ const removeUser = (user, socket, room) => {
         if (value.users.length <= 0)
         {
             delete UsersInRoom[room];
-            displayRooms(room);
         }
         // replace room master if needed
         else
@@ -138,13 +136,13 @@ const removeUser = (user, socket, room) => {
                 value.master = value.ids[0];
             }
         }
+        displayRooms(room);
     }
     room = '';
 }
 
 const displayRooms = (room) => {
     io.emit('displayRooms', JSON.stringify(UsersInRoom));
-    console.log('display rooms ' + room)
     if(room && UsersInRoom[room])
     {
         io.to(room).emit(   
@@ -153,7 +151,6 @@ const displayRooms = (room) => {
                 users: UsersInRoom[room].users,
                 master: UsersInRoom[room].master
             }));
-        console.log(`emitting users ${UsersInRoom[room]}`);
     }
 };
 
@@ -161,4 +158,10 @@ const displayRoomMessage = (room) => {
     if (!roomMessage[room]) roomMessage[room] = [];
     io.to(room).emit('updateRoomMessage', JSON.stringify(roomMessage[room]));
 }
-        
+
+function initRoom(room,UsersInRoom) {
+    
+    UsersInRoom[room] = {};
+    UsersInRoom[room].users = [];
+    UsersInRoom[room].ids = [];
+}

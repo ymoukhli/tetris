@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import Button from "../Button";
+// import Button from "../Button";
 import UserProfile from "./UserProfile";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../Slices/userSlice";
@@ -15,6 +15,6 @@ export default function () {
 
     return (<StyledUserProfile>
         <UserProfile user={user}></UserProfile>
-        <Button text="Edit"></Button>
+        {/* <Button text="Edit"></Button> *place to add user settings later on*/}
     </StyledUserProfile>);
 }

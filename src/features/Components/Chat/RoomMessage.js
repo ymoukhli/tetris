@@ -10,6 +10,7 @@ const StyeldMessages = styled.div`
     height: 75%;
     overflow-x: hidden;
     margin-top: 1em;
+    background-color: #BBF7FF;
 `
 
 export default function () {

@@ -40,6 +40,10 @@ export const socketMidlware = (store) => {
             socket.on('roomJoined', (dataString) => {
                 store.dispatch(setRoom(true));
             })
+            socket.on('removedFromRoom', () =>
+            {
+                store.dispatch(setRoom(false));
+            })
             socket.on('displayRoomUsers', (dataString) => {
                 console.log('receiving data of users in a room '+dataString)
                 const data = JSON.parse(dataString);
@@ -63,6 +67,10 @@ export const socketMidlware = (store) => {
         if (action.type === 'joinRoom')
         {
             socket.emit('joinRoom', JSON.stringify({room: action.payload}))
+        }
+        if (action.type === 'leaveRoom')
+        {
+            socket.emit('leaveRoom', JSON.stringify(action.payload))
         }
         if (addUser.match(action))
         {

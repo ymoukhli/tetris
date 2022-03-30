@@ -9,6 +9,7 @@ padding-top: 2em;
 display: flex;
 flex-direction: column;
 align-items: start;
+background-color: #BBF7FF;
 `
 
 export default function () {

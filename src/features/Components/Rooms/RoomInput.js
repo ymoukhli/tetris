@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-import Button from "../Button";
 import { useRef,useEffect } from "react";
 import { useDispatch } from "react-redux";
+
 const StyledRoomInput = styled.div`
     position: fixed;
     left: 0;
@@ -22,8 +22,7 @@ const StyledRoomInput = styled.div`
         button {
             margin: 1.2em 2em 0.2em;
         }
-    }
-
+    }l
 `
 
 export default function ({ setRoomInput }) {
