@@ -5,7 +5,8 @@ import { selectId, selectUser } from "../../Slices/userSlice";
 import styled from "styled-components";
 import Button from "../Button";
 import { useNavigate } from "react-router-dom";
-
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 const StyledRoom = styled.div`
     display:flex;
     margin: 0.4em 0;
@@ -22,19 +23,24 @@ const StyledRoom = styled.div`
 export default function({room,master,users,inRoom}) {
     const myId = useSelector(selectId);
     const user = useSelector(selectUser);
+    const location = useLocation();
     const navigate = useNavigate();
     // const ready = useSelector(selectReadyState);
     const dispatch = useDispatch();
     function joinRoom() {
         navigate(`#${room}[${user}]`)
-        dispatch({type: 'joinRoom', payload: room})
     }
 
     function leaveRoom() {
         navigate(``)
-        dispatch({type: 'leaveRoom', payload: room})
     }
-
+    
+    useEffect(() => {
+        if (location.hash === '' && inRoom)
+        {
+            dispatch({type: 'leaveRoom', payload: room});
+        }
+    }, [location]);
 
     const joined = users.find(e => e === user);
     

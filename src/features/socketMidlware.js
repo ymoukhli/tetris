@@ -45,7 +45,6 @@ export const socketMidlware = (store) => {
                 store.dispatch(setRoom(false));
             })
             socket.on('displayRoomUsers', (dataString) => {
-                console.log('receiving data of users in a room '+dataString)
                 const data = JSON.parse(dataString);
                 store.dispatch(setRoomUsers(data));
             })

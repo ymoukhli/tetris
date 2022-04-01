@@ -54,8 +54,9 @@ export default function ({ setRoomInput }) {
         let room = event.target[0].value;
         if (!room) room = Math.random().toString(36).replace(/[^a-z]+/g, '');
 
-        dispatch({type: 'creatRoom', payload: {room}})
-        navigate(`#${room}[${user}]`)
+        // dispatch({type: 'creatRoom', payload: {room}});
+        
+        navigate(`#${room}[${user}]`);
     }
     return (<StyledRoomInput >
             <form  onSubmit={handleSubmit} ref={roomInputRef}>

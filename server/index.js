@@ -73,9 +73,8 @@ io.on('connection', (socket) => {
 
         const dataObj = JSON.parse(data);
         // check if can join room +++
-        if (!dataObj.room)
-            dataObj.room = Math.random().toString(36).replace(/[^a-z]+/g, '');
-
+        if (!dataObj.room) return;
+        
         socket.join(dataObj.room);
         removeUser(dataObj.user ,socket, room);
         room = dataObj.room;
