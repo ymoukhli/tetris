@@ -31,18 +31,37 @@ io.on('connection', (socket) => {
         io.emit('updateGlobalMessage', JSON.stringify(globalMessages));
     });
 
-    socket.on("join", (data) => {
-        const dataObj = JSON.parse(data)
+    socket.on("joinOrEditUser", (dataString) => {
+        const data = JSON.parse(dataString)
         // check if username and room are valid
-        if(!dataObj || !dataObj.username ||
-        dataObj.username.trim().match(/^\w+/)[0].length !== dataObj.username.trim().length) return;
-        if (users.indexOf(dataObj.username) !== -1) return;
-        users.push(dataObj.username);
-        socket.emit('joined');
-        io.emit('updateOnlineUsers', users);
-        socket.emit('updateGlobalMessage',  JSON.stringify(globalMessages));
-        displayRooms();
-        user = dataObj.username;
+        if(!data || !data.user)
+        {
+            const matche =  data.user.trim().match(/^\w+/)?.[0];
+            if ((matche && matche.length !== dataObj.username.trim().length) || !matche)
+                return;
+        }
+        // if (users.indexOf(data.user) !== -1) return;
+        // users.push(dataObj.username);
+        // socket.emit('joined');
+        // io.emit('updateOnlineUsers', users);
+        // socket.emit('updateGlobalMessage',  JSON.stringify(globalMessages));
+        // displayRooms();
+        // user = dataObj.username;
+
+        if (Boolean(users.find(e => e.id === data.id)))
+        {
+            // edit user
+        }
+        else
+        {
+            // add user and emit update ui with emited events
+            users.push(data);
+            socket.emit('joined');
+            io.emit('updateOnlineUsers', JSON.stringify(users.map(e => e.user)))
+            io.emit('updateGlobalMessage', JSON.stringify(globalMessages));
+            displayRooms();
+            user = data.user;
+        }
     });
 
     // recieving a room message
@@ -141,13 +160,15 @@ const removeUser = (user, socket, room) => {
 }
 
 const displayRooms = (room) => {
+    // send data for rooms componant
     io.emit('displayRooms', JSON.stringify(UsersInRoom));
+    // send data for userRoom componant
     if(room && UsersInRoom[room])
     {
         io.to(room).emit(   
             'displayRoomUsers',
             JSON.stringify({
-                users: UsersInRoom[room].users,
+                users: UsersInRoom[room].users.map(e => e.user),
                 master: UsersInRoom[room].master
             }));
     }

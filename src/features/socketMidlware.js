@@ -18,8 +18,9 @@ export const socketMidlware = (store) => {
             socket.on('joined', () => {
                 store.dispatch(logIn())
             })
-            socket.on('updateOnlineUsers', (users) => {
-                store.dispatch(addOtherUsers(users))
+            socket.on('updateOnlineUsers', (dataString) => {
+                const data = JSON.stringify(dataString);
+                store.dispatch(addOtherUsers(data))
             })
 
             socket.on('updateGlobalMessage', (messages) => {
@@ -74,7 +75,7 @@ export const socketMidlware = (store) => {
         if (addUser.match(action))
         {
             store.dispatch(addId(socket.id));
-            socket.emit('join', JSON.stringify({username: action.payload}));
+            socket.emit('joinOrEditUser', JSON.stringify({user: action.payload, id: socket.id}));
         }
         next(action);
     }
