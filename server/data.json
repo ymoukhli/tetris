@@ -1,8 +1,7 @@
 {
     "UsersInRoom": {
         "ROOMNAME":{
-            "users": [],
-            "ids":[],
+            "users": [{"id": "", "username":""}],
             "master":""
         }
     },
@@ -10,5 +9,5 @@
     "roomMessage": {
         "ROOMNAME": [{"id":"", "username":"","text":""}]
     },
-    "users":[]
+    "users":[{"id": "", "user": ""}]
 }

@@ -10,7 +10,7 @@ import Button from './features/Components/Button';
 import { connectingSocket } from './features/sockets.slice';
 import { useDispatch } from 'react-redux';
 import { addUser } from './features/Slices/userSlice';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 const StyledApp = styled.div`
 background-color: gray;
 height: 100vh;
@@ -44,24 +44,28 @@ function App() {
   const joined = useSelector(selectLog);
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
   useEffect(() => {
     dispatch(connectingSocket);
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-      dispatch(addUser(e.target[0].value))
+    navigate(e.target[0].value)
   };
   
   useEffect(() => {
     console.log({location});
     if (!location.hash) return ;
-    const hash = location.hash.match(/^#([a-z]+)\[([a-z]+)]/i);
-    if (!hash) return ;
-    if (hash[0].length == hash.input.length)
+    let hash = location.hash.match(/^#([a-z0-9]+)\[([a-z0-9]+)]/i);
+    if (hash && hash[0].length == hash.input.length)
     {
       console.log('matched');
       dispatch({type: 'joinRoom', payload: hash[1]})
+    }
+    else if ((hash = location.hash.match(/^#([a-z0-9]+)/i)))
+    {
+      dispatch(addUser(hash[1]))
     }
   }, [location]);
 

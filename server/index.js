@@ -40,17 +40,11 @@ io.on('connection', (socket) => {
             if ((matche && matche.length !== dataObj.username.trim().length) || !matche)
                 return;
         }
-        // if (users.indexOf(data.user) !== -1) return;
-        // users.push(dataObj.username);
-        // socket.emit('joined');
-        // io.emit('updateOnlineUsers', users);
-        // socket.emit('updateGlobalMessage',  JSON.stringify(globalMessages));
-        // displayRooms();
-        // user = dataObj.username;
 
         if (Boolean(users.find(e => e.id === data.id)))
         {
             // edit user
+            resetUser(data);
         }
         else
         {
@@ -185,3 +179,21 @@ function initRoom(room,UsersInRoom) {
     UsersInRoom[room].users = [];
     UsersInRoom[room].ids = [];
 }
+
+function resetUser(data)
+{
+    const element = users.find(e = e.id === data.id);
+    if (element) element.user = data.user;
+    globalMessages.find(e => e.id === data.id).map(e => e.username = data.user);
+    for (const [key,value] of Object.entries(roomMessage))
+    {
+        if (Boolean(value.find(e => e.id === data.id)))
+        {
+            value.filter(e => e.id === data.id).map(e => e.username = data.user);
+            break;
+        }
+    }
+
+    // add reset for room names
+}
+

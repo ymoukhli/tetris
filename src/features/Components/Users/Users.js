@@ -14,9 +14,10 @@ align-items: start;
 export default function () {
     const users = useSelector(selectOtherUsers);
     const myusername = useSelector(selectUser);
-    const otherUsers = users.map(user => user !== myusername && <UserProfile key={user} user={user}></UserProfile>)
+    console.log(users);
+    // const otherUsers = users.map(user => user !== myusername && <UserProfile key={user} user={user}></UserProfile>);
     return (
     <StyledUsers>
-        {otherUsers}
+        {/* {otherUsers} */}
     </StyledUsers>);
 }
